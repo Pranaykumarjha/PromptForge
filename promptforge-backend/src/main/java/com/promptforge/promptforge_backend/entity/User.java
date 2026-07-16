@@ -1,8 +1,8 @@
 package com.promptforge.promptforge_backend.entity;
 
-
-
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +20,13 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Prompt> prompts = new ArrayList<>();
 
     public User() {
     }
@@ -61,5 +68,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Prompt> getPrompts() {
+        return prompts;
+    }
+
+    public void setPrompts(List<Prompt> prompts) {
+        this.prompts = prompts;
     }
 }
