@@ -33,10 +33,9 @@ public class CollectionController {
             @Valid @RequestBody CollectionRequest request,
             Authentication authentication) {
 
-        CollectionResponse response =
-                collectionService.createCollection(
-                        Long.parseLong(authentication.getName()),
-                        request);
+        CollectionResponse response = collectionService.createCollection(
+                authentication.getName(),
+                request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,8 +44,8 @@ public class CollectionController {
     public ResponseEntity<List<CollectionResponse>> getAllCollections(
             Authentication authentication) {
 
-        List<CollectionResponse> collections =
-                collectionService.getAllCollections(Long.parseLong(authentication.getName()));
+        List<CollectionResponse> collections = collectionService.getAllCollections(
+                authentication.getName());
 
         return ResponseEntity.ok(collections);
     }
@@ -56,10 +55,9 @@ public class CollectionController {
             @PathVariable Long id,
             Authentication authentication) {
 
-        CollectionResponse response =
-                collectionService.getCollectionById(
-                        Long.parseLong(authentication.getName()),
-                        id);
+        CollectionResponse response = collectionService.getCollectionById(
+                authentication.getName(),
+                id);
 
         return ResponseEntity.ok(response);
     }
@@ -70,11 +68,10 @@ public class CollectionController {
             @Valid @RequestBody CollectionRequest request,
             Authentication authentication) {
 
-        CollectionResponse response =
-                collectionService.updateCollection(
-                        authentication.getName(),
-                        id,
-                        request);
+        CollectionResponse response = collectionService.updateCollection(
+                authentication.getName(),
+                id,
+                request);
 
         return ResponseEntity.ok(response);
     }
@@ -96,10 +93,9 @@ public class CollectionController {
             @PathVariable Long collectionId,
             Authentication authentication) {
 
-        List<PromptResponse> prompts =
-                promptService.getPromptsByCollection(
-                        collectionId,
-                        authentication.getName());
+        List<PromptResponse> prompts = promptService.getPromptsByCollection(
+                collectionId,
+                authentication.getName());
 
         return ResponseEntity.ok(prompts);
     }

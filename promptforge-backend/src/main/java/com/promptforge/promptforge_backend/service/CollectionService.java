@@ -7,17 +7,23 @@ import java.util.List;
 
 public interface CollectionService {
 
-    CollectionResponse createCollection(Long userId, CollectionRequest request);
+    CollectionResponse createCollection(
+            String email,
+            CollectionRequest request);
 
-    List<CollectionResponse> getAllCollections(Long userId);
+    List<CollectionResponse> getAllCollections(
+            String email);
 
-    CollectionResponse getCollectionById(Long userId, Long collectionId);
+    CollectionResponse getCollectionById(
+            String email,
+            Long collectionId);
 
     CollectionResponse updateCollection(
             String email,
             Long collectionId,
-            CollectionRequest request
-    );
+            CollectionRequest request);
 
-    void deleteCollection(String email, Long collectionId);
+    void deleteCollection(
+            String email,
+            Long collectionId);
 }

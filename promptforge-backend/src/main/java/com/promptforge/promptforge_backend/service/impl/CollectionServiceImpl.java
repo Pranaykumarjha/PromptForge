@@ -34,9 +34,9 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public CollectionResponse createCollection(Long userId, CollectionRequest request) {
+    public CollectionResponse createCollection(String email, CollectionRequest request) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (collectionRepository.existsByNameAndUser(request.getName(), user)) {
@@ -44,7 +44,7 @@ public class CollectionServiceImpl implements CollectionService {
         }
 
         Collection collection = new Collection();
-        collection.setName(request.getName());
+        collection.setName(request.getName().trim());
         collection.setUser(user);
 
         Collection savedCollection = collectionRepository.save(collection);
@@ -53,9 +53,9 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public List<CollectionResponse> getAllCollections(Long userId) {
+    public List<CollectionResponse> getAllCollections(String email) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         List<Collection> collections = collectionRepository.findByUser(user);
@@ -66,9 +66,9 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public CollectionResponse getCollectionById(Long userId, Long collectionId) {
+    public CollectionResponse getCollectionById(String email, Long collectionId) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Collection collection = collectionRepository
@@ -85,7 +85,7 @@ public class CollectionServiceImpl implements CollectionService {
             CollectionRequest request) {
 
         User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Collection collection = collectionRepository
                 .findByIdAndUser(collectionId, user)
