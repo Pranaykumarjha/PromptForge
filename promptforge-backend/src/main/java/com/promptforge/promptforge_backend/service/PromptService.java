@@ -16,4 +16,16 @@ public interface PromptService {
     PromptResponse updatePrompt(Long id, PromptRequest request, String userEmail);
 
     void deletePrompt(Long id, String userEmail);
+
+    PromptResponse assignPromptToCollection(Long promptId,
+            Long collectionId,
+            String userEmail);
+
+    PromptResponse toggleFavorite(Long promptId, String userEmail);
+
+    List<PromptResponse> searchPrompts(String keyword, String userEmail);
+
+    List<PromptResponse> getFavoritePrompts(String userEmail);
+
+    List<PromptResponse> getPromptsByCollection(Long collectionId, String userEmail);
 }

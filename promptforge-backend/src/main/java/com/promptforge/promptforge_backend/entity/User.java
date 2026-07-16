@@ -28,6 +28,14 @@ public class User {
     )
     private List<Prompt> prompts = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<Collection> collections = new ArrayList<>();
+
     public User() {
     }
 
@@ -40,10 +48,6 @@ public class User {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -76,5 +80,13 @@ public class User {
 
     public void setPrompts(List<Prompt> prompts) {
         this.prompts = prompts;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 }

@@ -1,5 +1,6 @@
 package com.promptforge.promptforge_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,16 +19,27 @@ public class Prompt {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collection_id", nullable = false)
+    @JsonIgnore
+    private Collection collection;
+
+    @Column(name = "is_favorite", nullable = false)
+    private boolean favorite = false;
 
     public Prompt() {
     }
 
-    public Prompt(Long id, String title, String content, User user) {
+    public Prompt(Long id, String title, String content, User user, Collection collection, boolean favorite) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.user = user;
+        this.collection = collection;
+        this.favorite = favorite;
     }
 
     public Long getId() {
@@ -60,5 +72,21 @@ public class Prompt {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Collection getCollection() {
+        return collection;
+    }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }
