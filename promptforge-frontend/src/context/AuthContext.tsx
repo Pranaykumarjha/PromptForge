@@ -20,6 +20,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
         try {
@@ -64,6 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             localStorage.removeItem("user");
             setToken(null);
             setUser(null);
+        } finally {
+            setIsReady(true);
         }
     }, []);
 
@@ -89,6 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 user,
                 token,
                 isAuthenticated: !!token,
+                isReady,
                 login,
                 logout,
             }}
