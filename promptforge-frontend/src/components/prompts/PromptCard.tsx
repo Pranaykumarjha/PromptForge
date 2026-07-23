@@ -22,24 +22,26 @@ export default function PromptCard({
                 onDragStart(prompt.id);
             }}
             onClick={onClick}
-            className="cursor-pointer rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+            className="cursor-pointer rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
         >
             <div className="flex items-start justify-between gap-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {prompt.title}
                 </h3>
 
                 {prompt.favorite && (
-                    <span className="text-xl">⭐</span>
+                    <span className="text-xl" title="Favorite">
+                        ⭐
+                    </span>
                 )}
             </div>
 
-            <p className="mt-4 line-clamp-4 text-sm text-gray-600">
+            <p className="mt-4 line-clamp-4 text-sm text-gray-600 dark:text-gray-400">
                 {prompt.content}
             </p>
 
-            <div className="mt-6 flex items-center justify-between">
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+            <div className="mt-6 flex items-center justify-between gap-3">
+                <span className="rounded-full bg-gray-100 dark:bg-zinc-800 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300">
                     {prompt.collectionName ?? "No Collection"}
                 </span>
 
@@ -48,7 +50,7 @@ export default function PromptCard({
                         e.stopPropagation();
                         onClick();
                     }}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm transition-colors hover:bg-gray-100"
+                    className="rounded-lg border border-gray-300 dark:border-zinc-700 px-4 py-2 text-sm transition-all duration-200 hover:bg-gray-100 dark:hover:bg-zinc-800 dark:text-white"
                 >
                     View
                 </button>

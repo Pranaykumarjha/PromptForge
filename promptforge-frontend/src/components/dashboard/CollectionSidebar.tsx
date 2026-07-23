@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
+import Spinner from "@/components/ui/Spinner";
+
 import { Collection } from "@/types/collection";
+
 import {
     getAllCollections,
     createCollection,
@@ -29,60 +34,85 @@ export default function CollectionSidebar({
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editingName, setEditingName] = useState("");
 
+    const [submitting, setSubmitting] = useState(false);
+
     useEffect(() => {
         fetchCollections();
     }, []);
 
     const fetchCollections = async () => {
+        setLoading(true);
+
         try {
             const data = await getAllCollections();
             setCollections(data);
         } catch (error) {
-            console.error("Failed to fetch collections:", error);
+            console.error(error);
+            toast.error("Failed to load collections.");
         } finally {
             setLoading(false);
         }
     };
 
     const handleCreateCollection = async () => {
-        if (!newCollection.trim()) return;
+        if (!newCollection.trim() || submitting) return;
+
+        setSubmitting(true);
 
         try {
             await createCollection(newCollection);
+
+            toast.success("Collection created.");
 
             setNewCollection("");
             setShowInput(false);
 
             await fetchCollections();
         } catch (error) {
-            console.error("Failed to create collection:", error);
+            console.error(error);
+            toast.error("Failed to create collection.");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handleRenameCollection = async (id: number) => {
-        if (!editingName.trim()) return;
+        if (!editingName.trim() || submitting) return;
+
+        setSubmitting(true);
 
         try {
             await updateCollection(id, editingName);
+
+            toast.success("Collection renamed.");
 
             setEditingId(null);
             setEditingName("");
 
             await fetchCollections();
         } catch (error) {
-            console.error("Failed to rename collection:", error);
+            console.error(error);
+            toast.error("Failed to rename collection.");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handleDeleteCollection = async (id: number) => {
+        if (submitting) return;
+
         const confirmed = window.confirm(
             "Are you sure you want to delete this collection?"
         );
 
         if (!confirmed) return;
 
+        setSubmitting(true);
+
         try {
             await deleteCollection(id);
+
+            toast.success("Collection deleted.");
 
             if (selectedCollectionId === id) {
                 onSelectCollection(null);
@@ -90,22 +120,25 @@ export default function CollectionSidebar({
 
             await fetchCollections();
         } catch (error) {
-            console.error("Failed to delete collection:", error);
+            console.error(error);
+            toast.error("Failed to delete collection.");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     return (
-        <div className="bg-white rounded-xl shadow p-5">
+        <div className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-sm">
 
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Collections
                 </h2>
 
                 <button
                     onClick={() => setShowInput(true)}
-                    className="text-xl font-bold text-blue-600 hover:text-blue-800"
+                    className="text-2xl font-bold text-blue-600 transition hover:scale-110"
                 >
                     +
                 </button>
@@ -120,26 +153,30 @@ export default function CollectionSidebar({
                         placeholder="Collection name"
                         value={newCollection}
                         onChange={(e) => setNewCollection(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
                     />
 
                     <div className="flex gap-2">
+
                         <button
+                            disabled={submitting}
                             onClick={handleCreateCollection}
-                            className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+                            className="rounded-lg bg-blue-600 px-3 py-2 text-white transition hover:bg-blue-700 disabled:opacity-60"
                         >
                             Create
                         </button>
 
                         <button
+                            disabled={submitting}
                             onClick={() => {
                                 setShowInput(false);
                                 setNewCollection("");
                             }}
-                            className="rounded-lg border px-3 py-2 hover:bg-gray-100"
+                            className="rounded-lg border border-gray-300 dark:border-zinc-700 px-3 py-2 transition hover:bg-gray-100 dark:hover:bg-zinc-800"
                         >
                             Cancel
                         </button>
+
                     </div>
 
                 </div>
@@ -149,22 +186,22 @@ export default function CollectionSidebar({
             <button
                 onClick={() => onSelectCollection(null)}
                 className={`mb-2 w-full rounded-lg px-3 py-2 text-left transition ${selectedCollectionId === null
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-gray-100"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-zinc-800 dark:text-gray-200"
                     }`}
             >
                 📁 All Prompts
             </button>
 
-            {/* Collections */}
+            {/* Loading */}
             {loading ? (
-                <p className="text-sm text-gray-500">
-                    Loading collections...
-                </p>
+                <div className="flex justify-center py-8">
+                    <Spinner size="sm" />
+                </div>
             ) : collections.length === 0 ? (
-                <p className="text-sm text-gray-500">
+                <div className="rounded-lg border border-dashed border-gray-300 dark:border-zinc-700 p-4 text-center text-sm text-gray-500 dark:text-gray-400">
                     No collections found.
-                </p>
+                </div>
             ) : (
                 <div className="space-y-2">
 
@@ -175,35 +212,28 @@ export default function CollectionSidebar({
                             onDrop={(e) => {
                                 e.preventDefault();
 
-                                const raw = e.dataTransfer.getData("text/plain");
-                                console.log("Raw drag data:", raw);
-
-                                const promptId = Number(raw);
-                                console.log("Parsed promptId:", promptId);
+                                const promptId = Number(
+                                    e.dataTransfer.getData("text/plain")
+                                );
 
                                 if (!promptId) return;
 
                                 onDropPrompt(promptId, collection.id);
                             }}
                             className={`flex items-center justify-between rounded-lg px-3 py-2 transition ${selectedCollectionId === collection.id
-                                ? "bg-blue-600 text-white"
-                                : "hover:bg-gray-100"
+                                    ? "bg-blue-600 text-white"
+                                    : "hover:bg-gray-100 dark:hover:bg-zinc-800"
                                 }`}
                         >
                             {editingId === collection.id ? (
                                 <input
                                     value={editingName}
-                                    onChange={(e) =>
-                                        setEditingName(e.target.value)
-                                    }
+                                    onChange={(e) => setEditingName(e.target.value)}
                                     className="flex-1 rounded border px-2 py-1 text-black"
                                 />
                             ) : (
                                 <button
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onClick={() =>
-                                        onSelectCollection(collection.id)
-                                    }
+                                    onClick={() => onSelectCollection(collection.id)}
                                     className="flex-1 text-left"
                                 >
                                     📁 {collection.name}
@@ -212,10 +242,9 @@ export default function CollectionSidebar({
 
                             {editingId === collection.id ? (
                                 <button
-                                    onClick={() =>
-                                        handleRenameCollection(collection.id)
-                                    }
-                                    className="ml-2 rounded bg-green-600 px-2 py-1 text-sm text-white hover:bg-green-700"
+                                    disabled={submitting}
+                                    onClick={() => handleRenameCollection(collection.id)}
+                                    className="ml-2 rounded bg-green-600 px-2 py-1 text-sm text-white transition hover:bg-green-700 disabled:opacity-60"
                                 >
                                     Save
                                 </button>
@@ -223,20 +252,22 @@ export default function CollectionSidebar({
                                 <div className="ml-2 flex items-center gap-2">
 
                                     <button
+                                        title="Rename Collection"
                                         onClick={() => {
                                             setEditingId(collection.id);
                                             setEditingName(collection.name);
                                         }}
-                                        title="Rename Collection"
+                                        className="transition hover:scale-110"
                                     >
                                         ✏️
                                     </button>
 
                                     <button
+                                        title="Delete Collection"
                                         onClick={() =>
                                             handleDeleteCollection(collection.id)
                                         }
-                                        title="Delete Collection"
+                                        className="transition hover:scale-110"
                                     >
                                         🗑️
                                     </button>
