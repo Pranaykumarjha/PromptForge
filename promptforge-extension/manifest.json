@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "PromptForge",
+  "description": "Save, organize, search, and reuse AI prompts across ChatGPT, Claude, Gemini, and Perplexity.",
+  "version": "1.0.0",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "action": {
+    "default_title": "PromptForge",
+    "default_popup": "src/popup/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "css": [
+        "src/styles/sidebar.css"
+      ],
+      "js": [
+        "src/content/injectButton.js",
+        "src/content/sidebar.js",
+        "src/content/promptDetector.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
